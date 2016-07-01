@@ -10,6 +10,7 @@ using UnityEngine;
 
 using Oxide.Core;
 using Oxide.Core.Libraries;
+using Oxide.Core.Libraries.Covalence;
 using Oxide.Core.Plugins;
 using Oxide.Game.Hurtworld.Libraries;
 using Oxide.Game.Hurtworld.Libraries.Covalence;
@@ -997,7 +998,15 @@ namespace Oxide.Game.Hurtworld
         /// <param name="arg"></param>
         /// <returns></returns>
         [HookMethod("OnServerCommand")]
-        private object OnServerCommand(string arg) => arg == null || arg.Trim().Length == 0 ? null : cmdlib.HandleConsoleCommand(arg);
+        private object OnServerCommand(string arg)
+        {
+            if (arg == null || arg.Trim().Length == 0) return null;
+            
+            // Is this a covalence command?
+            if (covalence.CommandSystem.HandleConsoleMessage(covalence.CommandSystem.consolePlayer, arg)) return true;
+            
+            return cmdlib.HandleConsoleCommand(arg);
+        } 
 
         /// <summary>
         /// Parses the specified chat command
